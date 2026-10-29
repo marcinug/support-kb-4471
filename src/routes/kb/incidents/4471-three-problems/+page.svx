@@ -20,12 +20,14 @@ signature: marcinug
   };
 </script>
 
-[#4471](/kb/incidents/4471) is marked known: one bug, one fix queued. Its reports say otherwise.
+[#4471](/kb/incidents/4471) was marked known: one bug, one fix queued. Its reports say otherwise.
 They were merged on subject line alone ([decision 0001](/kb/decisions/0001-dedupe-by-subject)),
-and three different problems share those subjects. The queued parser fix closes one of them.
+and three different problems share those subjects. Engineering closed #4471 on 5 October with
+two answers. The third problem got none.
 
 <Callout kind="warn">
-Not one issue. Three problems, three tickets. Do not close #4471 when the parser fix ships.
+Three problems, three tickets. Two are answered. The one-day move is still open: it has no fix
+and no owner.
 </Callout>
 
 ## What is in #4471
@@ -37,22 +39,23 @@ view counts: one report per id, filed by tenant and channel. Nobody typed a numb
 
 ## The three problems
 
-**`parser`: the shared parser reads every date month first.** Every tenant on file writes the
-day first, so their dates come out with day and month swapped: 7 April becomes 4 July. It
-reaches people through the app, by email and through `booking-v2` forms. This is the bug the
-queued fix is for.
+**`parser`: the shared parser read every date month first.** Every tenant on file writes the
+day first, so their dates came out with day and month swapped: 7 April became 4 July. It
+reached people through the app, by email and through `booking-v2` forms. **Fixed** by
+engineering: `fix(dates): parse dd/mm for eu locales`.
 
-**`hint`: the `booking-v3` form tells people to type month first.** Its date field shows
-`MM/DD/YYYY`, so people type the month first, and the form reads the date the tenant's way, day first.
-The date flips before the parser sees it. Only reports that come in through a `booking-v3` form
-belong here. Fixing the parser does not fix the hint, so these keep coming after #4471's fix ships.
+**`hint`: the `booking-v3` form told people to type month first.** Its date field showed
+`MM/DD/YYYY`, so people typed the month first, and the form read the date the tenant's way, day
+first. The date flipped before the parser saw it, so the parser fix does not cover it. Only
+reports that came in through a `booking-v3` form belong here. **Won't fix**: the `booking-v3`
+form is retired.
 
 **`one-day move`: a date lands one day off, not flipped.** "Tuesday 12 May" shows as "Monday
 11 May". A client in Lisbon and a client in Toronto see different days for the same meeting.
-An invite arrives before the booking was made. Nothing is swapped, so the parser fix will not
-touch it. It looks like a time zone conversion. These are the reports the desk already read as
-a one-day move (`desk-notes.json`). The desk counts them where they are filed, under `parser`
-by tenant, and they have a ticket of their own.
+An invite arrives before the booking was made. Nothing is swapped, so the parser fix does not
+touch it, and retiring a form does not either. It looks like a time zone conversion. These are
+the reports the desk already read as a one-day move (`desk-notes.json`). The desk counts them
+where they are filed, under `parser` by tenant, and they have a ticket of their own. **Open.**
 
 ## Why the tags do not help
 
@@ -65,7 +68,7 @@ came in. The table on #4471 shows how far the tags are from the causes:
 
 - Keep the three tickets apart. A new report about a wrong date goes to the problem its tenant,
   channel and body point to, not to the ticket with the same subject.
-- When the parser fix ships, check the `hint` and `one-day move` tickets before you close anything.
+- A one-day move after 5 October is not a reopened #4471. File it under the `one-day move` ticket.
 - Subject matching keeps merging these together. Decision 0001 stands until a new record replaces it.
 
 <RenderStamp {signature} />
