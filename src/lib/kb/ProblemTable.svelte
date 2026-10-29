@@ -1,33 +1,28 @@
 <script lang="ts">
   import reports from '#lib/data/reports-4471.json';
   import notes from '#lib/data/desk-notes.json';
-  import { groupByCause, uniqueById, type Report } from '#lib/kb/causes';
+  import { groupByCause, readAs, uniqueById, type Report } from '#lib/kb/causes';
   import { tenantOf } from '#lib/kb/locales';
 
-  // One row per problem in a merged ticket: the causes from causes.ts, plus the reports the desk read
-  // as a one-day move (desk-notes.json), which are not a flipped date and get a row of their own.
+  // One row per problem in a merged ticket, counted the desk's way: each cause from causes.ts, then the
+  // reports the desk read as a one-day move (desk-notes.json), counted where they're filed and again here.
   let { ticket, issues = {} }: { ticket: number; issues?: Record<string, string> } = $props();
 
   const ONE_DAY = 'one-day move';
   const merged = $derived(uniqueById(reports as Report[]).filter((r) => r.mergedInto === ticket));
-  const isMove = (r: Report) => notes.oneDayMove.includes(r.id);
+  const groups = $derived(groupByCause(merged, tenantOf));
+  const moved = $derived(merged.filter((r) => notes.oneDayMove.includes(r.id)));
 
   const rows = $derived.by(() => {
-    const span = (rs: Report[]) => {
-      const days = rs.map((r) => r.receivedAt.slice(0, 10)).sort();
-      return `${days[0]} → ${days[days.length - 1]}`;
-    };
-    const moved = merged.filter(isMove);
+    const days = moved.map((r) => r.receivedAt.slice(0, 10)).sort();
     return [
-      ...groupByCause(merged.filter((r) => !isMove(r)), tenantOf).map((g) => ({
-        problem: g.cause as string,
-        reports: g.reports.length,
-        tenants: g.tenants,
-        seen: `${g.firstSeen} → ${g.lastSeen}`,
-      })),
-      ...(moved.length ? [{ problem: ONE_DAY, reports: moved.length, tenants: new Set(moved.map((r) => r.tenant)).size, seen: span(moved) }] : []),
+      ...groups.map((g) => ({ problem: g.cause as string, reports: g.reports.length, tenants: g.tenants, seen: `${g.firstSeen} → ${g.lastSeen}` })),
+      ...(moved.length
+        ? [{ problem: ONE_DAY, reports: moved.length, tenants: new Set(moved.map((r) => r.tenant)).size, seen: `${days[0]} → ${days[days.length - 1]}` }]
+        : []),
     ];
   });
+  const link = (problem: string) => issues[problem];
 </script>
 
 <p class="sum">
@@ -47,12 +42,20 @@
         <td>{row.reports}</td>
         <td>{row.tenants}</td>
         <td>{row.seen}</td>
-        <td>{#if issues[row.problem]}<a href={issues[row.problem]}>{issues[row.problem].replace(/^.*\/issues\//, '#')}</a>{:else}none yet{/if}</td>
+        <td>{#if link(row.problem)}<a href={link(row.problem)}>{link(row.problem).replace(/^.*\/issues\//, '#')}</a>{:else}none yet{/if}</td>
       </tr>
     {/each}
   </tbody>
 </table>
 
+{#each groups as g (g.cause)}
+  {@const n = readAs(g, notes.oneDayMove)}
+  {#if n}
+    <p class="note">{n} of the <code>{g.cause}</code> reports read as a one-day move: counted under <code>{g.cause}</code> by tenant, and under <code>{ONE_DAY}</code>.</p>
+  {/if}
+{/each}
+
 <style>
   .sum { font-size: 1.1rem; }
+  .note { color: var(--muted); font-size: 0.85em; }
 </style>

@@ -59,10 +59,11 @@ Not one issue. Three problems, three tickets. Do not close #4471 when the parser
 <p class="sum"><strong>412</strong> reports merged into #4471 · <strong>3</strong> problems</p>
 <table>
   <thead><tr><th>problem</th><th>reports</th><th>tenants</th><th>seen</th><th>ticket</th></tr></thead>
-  <tbody><tr><td><code>parser</code></td><td>374</td><td>11</td><td>2026-04-01 → 2026-10-04</td><td><a href="https://github.com/marcinug/support-kb-4471/issues/1">#1</a></td></tr><tr><td><code>hint</code></td><td>33</td><td>3</td><td>2026-04-17 → 2026-09-22</td><td><a href="https://github.com/marcinug/support-kb-4471/issues/2">#2</a></td></tr><tr><td><code>one-day move</code></td><td>5</td><td>5</td><td>2026-04-02 → 2026-10-04</td><td><a href="https://github.com/marcinug/support-kb-4471/issues/3">#3</a></td></tr></tbody>
+  <tbody><tr><td><code>parser</code></td><td>379</td><td>11</td><td>2026-04-01 → 2026-10-04</td><td><a href="https://github.com/marcinug/support-kb-4471/issues/1">#1</a></td></tr><tr><td><code>hint</code></td><td>33</td><td>3</td><td>2026-04-17 → 2026-09-22</td><td><a href="https://github.com/marcinug/support-kb-4471/issues/2">#2</a></td></tr><tr><td><code>one-day move</code></td><td>5</td><td>5</td><td>2026-04-02 → 2026-10-04</td><td><a href="https://github.com/marcinug/support-kb-4471/issues/3">#3</a></td></tr></tbody>
 </table>
-<p>Every count above is computed from the ticket export at render time, after dropping
-reports the export lists twice. Nobody typed a number into this page.</p>
+<p class="note">5 of the <code>parser</code> reports read as a one-day move: counted under <code>parser</code> by tenant, and under <code>one-day move</code>.</p>
+<p>Every count above is computed from the ticket export at render time, the way the desk's own
+view counts: one report per id, filed by tenant and channel. Nobody typed a number into this page.</p>
 <h2>The three problems</h2>
 <p><strong><code>parser</code>: the shared parser reads every date month first.</strong> Every tenant on file writes the
 day first, so their dates come out with day and month swapped: 7 April becomes 4 July. It
@@ -76,7 +77,8 @@ belong here. Fixing the parser does not fix the hint, so these keep coming after
 11 May". A client in Lisbon and a client in Toronto see different days for the same meeting.
 An invite arrives before the booking was made. Nothing is swapped, so the parser fix will not
 touch it. It looks like a time zone conversion. These are the reports the desk already read as
-a one-day move (<code>desk-notes.json</code>) and still filed under <code>parser</code> by tenant.</p>
+a one-day move (<code>desk-notes.json</code>). The desk counts them where they are filed, under <code>parser</code>
+by tenant, and they have a ticket of their own.</p>
 <h2>Why the tags do not help</h2>
 <p>Intake tags a report from the reporter's browser, not from the tenant or the way the report
 came in. The table on #4471 shows how far the tags are from the causes:</p>

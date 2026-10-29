@@ -32,8 +32,8 @@ Not one issue. Three problems, three tickets. Do not close #4471 when the parser
 
 <ProblemTable ticket={4471} {issues} />
 
-Every count above is computed from the ticket export at render time, after dropping
-reports the export lists twice. Nobody typed a number into this page.
+Every count above is computed from the ticket export at render time, the way the desk's own
+view counts: one report per id, filed by tenant and channel. Nobody typed a number into this page.
 
 ## The three problems
 
@@ -51,7 +51,8 @@ belong here. Fixing the parser does not fix the hint, so these keep coming after
 11 May". A client in Lisbon and a client in Toronto see different days for the same meeting.
 An invite arrives before the booking was made. Nothing is swapped, so the parser fix will not
 touch it. It looks like a time zone conversion. These are the reports the desk already read as
-a one-day move (`desk-notes.json`) and still filed under `parser` by tenant.
+a one-day move (`desk-notes.json`). The desk counts them where they are filed, under `parser`
+by tenant, and they have a ticket of their own.
 
 ## Why the tags do not help
 
