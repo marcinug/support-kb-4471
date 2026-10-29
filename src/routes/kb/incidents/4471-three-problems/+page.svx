@@ -4,7 +4,7 @@ title: '#4471 · three problems, not one'
 owner: marcinug
 status: open
 reviewed: 2026-10-29
-signature: marcinug
+signature: v1.eyJzdWIiOiIzMjMzIiwiYXVkIjoiY2hhbGxlbmdlOndoYXQtaXQtc2hvd3MiLCJpYXQiOjE3OTMzMDUxNTUsImV4cCI6MTc5MzM5MTU1NX0.GcVyvH2VfXimjONPrlgqhsb1SEEr9do42ZbD1zIgpoo
 ---
 
 <script>
