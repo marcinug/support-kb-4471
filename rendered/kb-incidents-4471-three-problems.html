@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>#4471 · three problems, not one · support kb</title>
+<style>
+  :root {
+    --bg: #fbfaf7; --fg: #1d1d1b; --muted: #6b6a66; --line: #e3e0d8;
+    --accent: #2f6f5e; --warn: #b4501f; --warn-bg: #fbeee6; --note-bg: #eef5f2;
+    --mono: ui-monospace, 'Cascadia Code', Menlo, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #171716; --fg: #ecebe6; --muted: #9c9a93; --line: #34332f;
+      --accent: #6fbfa6; --warn: #f0905d; --warn-bg: #3a2418; --note-bg: #1d2c27;
+    }
+  }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.6 system-ui, sans-serif; }
+  .kb table { border-collapse: collapse; width: 100%; margin: 1rem 0; font-size: 0.92rem; }
+  .kb th, .kb td { border-bottom: 1px solid var(--line); padding: 0.35rem 0.5rem; text-align: left; }
+  .kb code { font-family: var(--mono); font-size: 0.88em; }
+  .kb a { color: var(--accent); }
+  .kb { max-width: 760px; margin: 0 auto; padding: 2rem 16px 4rem; }
+  .crumb { font: 0.8rem var(--mono); text-decoration: none; color: var(--muted); }
+  h1 { margin: 0.25rem 0 0.5rem; line-height: 1.2; }
+  .meta { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; color: var(--muted); font-size: 0.85rem; margin: 0; }
+  .status { border: 1px solid var(--line); border-radius: 99px; padding: 0 0.6rem; }
+  .stale { color: var(--warn); font-weight: 600; }
+  .banner { background: var(--warn-bg); color: var(--warn); padding: 0.6rem 1rem; border-radius: 6px; }
+  footer { margin-top: 3rem; color: var(--muted); font-size: 0.8rem; border-top: 1px solid var(--line); padding-top: 1rem; }
+
+  aside { border-left: 4px solid var(--accent); padding: 0.5rem 1rem; margin: 1rem 0; background: var(--note-bg); }
+  aside.warn { border-color: var(--warn); background: var(--warn-bg); }
+  .sum { font-size: 1.1rem; } .tags, .note { color: var(--muted); font-size: 0.85em; }
+  .wrong td { background: var(--warn-bg); } .wrong td:last-child { color: var(--warn); font-weight: 600; }
+  .stamp { margin: 2rem 0 0; font: 0.85rem var(--mono); color: var(--muted); } .stamp b { color: var(--accent); letter-spacing: 0.04em; }
+</style>
+</head>
+<body>
+<div class="kb">
+  <header>
+    <a class="crumb" href="/kb">support desk · kb</a>
+    <h1>#4471 · three problems, not one</h1>
+    <p class="meta">
+      <span>owner <b>marcinug</b></span>
+      <span class="status open">open</span>
+      <span>reviewed 2026-10-29 · 0 days ago</span>
+    </p>
+  </header>
+  <main>
+<p><a href="/kb/incidents/4471">#4471</a> is marked known: one bug, one fix queued. Its reports say otherwise.
+They were merged on subject line alone (<a href="/kb/decisions/0001-dedupe-by-subject">decision 0001</a>),
+and three different problems share those subjects. The queued parser fix closes one of them.</p>
+<aside class="warn">
+Not one issue. Three problems, three tickets. Do not close #4471 when the parser fix ships.
+</aside>
+<h2>What is in #4471</h2>
+<p class="sum"><strong>412</strong> reports merged into #4471 · <strong>3</strong> problems</p>
+<table>
+  <thead><tr><th>problem</th><th>reports</th><th>tenants</th><th>seen</th><th>ticket</th></tr></thead>
+  <tbody><tr><td><code>parser</code></td><td>374</td><td>11</td><td>2026-04-01 → 2026-10-04</td><td><a href="https://github.com/marcinug/support-kb-4471/issues/1">#1</a></td></tr><tr><td><code>hint</code></td><td>33</td><td>3</td><td>2026-04-17 → 2026-09-22</td><td><a href="https://github.com/marcinug/support-kb-4471/issues/2">#2</a></td></tr><tr><td><code>one-day move</code></td><td>5</td><td>5</td><td>2026-04-02 → 2026-10-04</td><td><a href="https://github.com/marcinug/support-kb-4471/issues/3">#3</a></td></tr></tbody>
+</table>
+<p>Every count above is computed from the ticket export at render time, after dropping
+reports the export lists twice. Nobody typed a number into this page.</p>
+<h2>The three problems</h2>
+<p><strong><code>parser</code>: the shared parser reads every date month first.</strong> Every tenant on file writes the
+day first, so their dates come out with day and month swapped: 7 April becomes 4 July. It
+reaches people through the app, by email and through <code>booking-v2</code> forms. This is the bug the
+queued fix is for.</p>
+<p><strong><code>hint</code>: the <code>booking-v3</code> form tells people to type month first.</strong> Its date field shows
+<code>MM/DD/YYYY</code>, so people type the month first, and the form reads the date the tenant's way, day first.
+The date flips before the parser sees it. Only reports that come in through a <code>booking-v3</code> form
+belong here. Fixing the parser does not fix the hint, so these keep coming after #4471's fix ships.</p>
+<p><strong><code>one-day move</code>: a date lands one day off, not flipped.</strong> "Tuesday 12 May" shows as "Monday
+11 May". A client in Lisbon and a client in Toronto see different days for the same meeting.
+An invite arrives before the booking was made. Nothing is swapped, so the parser fix will not
+touch it. It looks like a time zone conversion. These are the reports the desk already read as
+a one-day move (<code>desk-notes.json</code>) and still filed under <code>parser</code> by tenant.</p>
+<h2>Why the tags do not help</h2>
+<p>Intake tags a report from the reporter's browser, not from the tenant or the way the report
+came in. The table on #4471 shows how far the tags are from the causes:</p>
+<p class="sum"><strong>412</strong> reports merged into #4471 · <strong>2</strong> causes</p>
+<table>
+  <thead><tr><th>cause</th><th>reports</th><th>tagged as</th><th>tenants</th><th>seen</th><th></th></tr></thead>
+  <tbody><tr><td><code>parser</code></td><td>379</td><td class="tags">parser ×356 · hint ×23</td><td>11</td><td>2026-04-01 → 2026-10-04</td><td>#4471</td></tr><tr class="wrong"><td><code>hint</code></td><td>33</td><td class="tags">hint ×18 · parser ×15</td><td>3</td><td>2026-04-17 → 2026-09-22</td><td>not this ticket — no ticket of its own</td></tr></tbody>
+</table>
+<p class="note">5 reports read as a one-day move; filed under <code>parser</code> by tenant.</p>
+<h2>What changes on the desk</h2>
+<ul>
+<li>Keep the three tickets apart. A new report about a wrong date goes to the problem its tenant,
+channel and body point to, not to the ticket with the same subject.</li>
+<li>When the parser fix ships, check the <code>hint</code> and <code>one-day move</code> tickets before you close anything.</li>
+<li>Subject matching keeps merging these together. Decision 0001 stands until a new record replaces it.</li>
+</ul>
+<p class="stamp">desk ref <b>DR-VEWD-9WWQ</b></p>
+  </main>
+  <footer>Pages are written by people. Tables and charts are built from data at render time.</footer>
+</div>
+</body>
+</html>

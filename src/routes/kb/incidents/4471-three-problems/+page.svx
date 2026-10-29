@@ -1,0 +1,70 @@
+---
+layout: runbook
+title: '#4471 · three problems, not one'
+owner: marcinug
+status: open
+reviewed: 2026-10-29
+signature: marcinug
+---
+
+<script>
+  import ProblemTable from '#lib/kb/ProblemTable.svelte';
+  import CauseTable from '#lib/kb/CauseTable.svelte';
+  import Callout from '#lib/kb/Callout.svelte';
+  import RenderStamp from '#lib/kb/RenderStamp.svelte';
+
+  const issues = {
+    parser: 'https://github.com/marcinug/support-kb-4471/issues/1',
+    hint: 'https://github.com/marcinug/support-kb-4471/issues/2',
+    'one-day move': 'https://github.com/marcinug/support-kb-4471/issues/3',
+  };
+</script>
+
+[#4471](/kb/incidents/4471) is marked known: one bug, one fix queued. Its reports say otherwise.
+They were merged on subject line alone ([decision 0001](/kb/decisions/0001-dedupe-by-subject)),
+and three different problems share those subjects. The queued parser fix closes one of them.
+
+<Callout kind="warn">
+Not one issue. Three problems, three tickets. Do not close #4471 when the parser fix ships.
+</Callout>
+
+## What is in #4471
+
+<ProblemTable ticket={4471} {issues} />
+
+Every count above is computed from the ticket export at render time, after dropping
+reports the export lists twice. Nobody typed a number into this page.
+
+## The three problems
+
+**`parser`: the shared parser reads every date month first.** Every tenant on file writes the
+day first, so their dates come out with day and month swapped: 7 April becomes 4 July. It
+reaches people through the app, by email and through `booking-v2` forms. This is the bug the
+queued fix is for.
+
+**`hint`: the `booking-v3` form tells people to type month first.** Its date field shows
+`MM/DD/YYYY`, so people type the month first, and the form reads the date the tenant's way, day first.
+The date flips before the parser sees it. Only reports that come in through a `booking-v3` form
+belong here. Fixing the parser does not fix the hint, so these keep coming after #4471's fix ships.
+
+**`one-day move`: a date lands one day off, not flipped.** "Tuesday 12 May" shows as "Monday
+11 May". A client in Lisbon and a client in Toronto see different days for the same meeting.
+An invite arrives before the booking was made. Nothing is swapped, so the parser fix will not
+touch it. It looks like a time zone conversion. These are the reports the desk already read as
+a one-day move (`desk-notes.json`) and still filed under `parser` by tenant.
+
+## Why the tags do not help
+
+Intake tags a report from the reporter's browser, not from the tenant or the way the report
+came in. The table on #4471 shows how far the tags are from the causes:
+
+<CauseTable ticket={4471} />
+
+## What changes on the desk
+
+- Keep the three tickets apart. A new report about a wrong date goes to the problem its tenant,
+  channel and body point to, not to the ticket with the same subject.
+- When the parser fix ships, check the `hint` and `one-day move` tickets before you close anything.
+- Subject matching keeps merging these together. Decision 0001 stands until a new record replaces it.
+
+<RenderStamp {signature} />
